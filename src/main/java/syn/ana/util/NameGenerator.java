@@ -2,13 +2,24 @@ package syn.ana.util;
 
 import java.util.Random;
 
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+
+@Component
 public class NameGenerator {
 
+	@Value("${leftMostChar}")
+	private int firstChar; // Allows for limiting of scope to different alphabets
+
+	@Value("${rightMostChar}")
+	private int lastChar;
+
 	public String generateName(int length, String beginning) {
-		if (beginning.length() >= length) {
-			return formatName(beginning.substring(0, length));
+		String startString = beginning.replace(" ", "");
+		if (startString.length() >= length) {
+			return formatName(startString.substring(0, length));
 		} else {
-			return formatName(beginning.concat(generateLetters(length - beginning.length())));
+			return formatName(startString.concat(generateLetters(length - startString.length())));
 		}
 	}
 
@@ -18,12 +29,10 @@ public class NameGenerator {
 
 	public String generateLetters(int length) {
 
-		int leftLimit = Integer.valueOf("${leftMostChar}");
-		int rightLimit = Integer.valueOf("${rightMostChar}");
 		Random random = new Random();
 		StringBuilder buffer = new StringBuilder(length);
 		for (int i = 0; i < length; i++) {
-			int randomLimitedInt = leftLimit + (int) (random.nextFloat() * (rightLimit - leftLimit + 1));
+			int randomLimitedInt = firstChar + (int) (random.nextFloat() * (lastChar - firstChar + 1));
 			buffer.append((char) randomLimitedInt);
 		}
 		return buffer.toString();
